@@ -13,7 +13,7 @@ jobs:
           curl \
           -H "Accept: application/vnd.github.v3+json" \
           -H "Authorization: token ${{ secrets.PUBLIC_RELEASE_TOKEN }}" \
-          https://api.github.com/repos/Pirate-MIDI/CLiCK/releases -o release.json
+          https://api.github.com/repos/Pirate-MIDI/uLoop/releases -o release.json
           
       - name: JSON to Variables Release
         uses: antifree/json-to-variables@v1.0.1
@@ -29,9 +29,9 @@ jobs:
         id: downloadAssets
         uses: dsaltares/fetch-gh-release-asset@master
         with:
-          repo: 'Pirate-MIDI/CLiCK'
+          repo: 'Pirate-MIDI/uLoop'
           version: 'tags/${{env.release_0_tag_name}}'
-          file: "click"
+          file: "uloop"
           regex: true
           target: 'assets/'
           token: ${{ secrets.PUBLIC_RELEASE_TOKEN }}
@@ -47,7 +47,7 @@ jobs:
           -X POST \
           -H "Accept: application/vnd.github.v3+json" \
           -H "Authorization: token ${{ secrets.PUBLIC_RELEASE_TOKEN }}" \
-          https://api.github.com/repos/Pirate-MIDI/Pirate-MIDI-CLiCK/releases \
+          https://api.github.com/repos/Pirate-MIDI/Pirate-MIDI-uLoop/releases \
           -d '{"tag_name":"${{env.release_0_tag_name}}","target_commitish":"main","name":"${{env.release_0_name}}","body":${{toJson(env.release_0_body)}},"draft":false,"prerelease":${{env.release_0_prerelease}},"generate_release_notes":false}' -o newRelease.json
       
       - name: JSON to Variables New Release
@@ -64,48 +64,3 @@ jobs:
           files: 'assets/*.uf2'
           repo-token: ${{ secrets.PUBLIC_RELEASE_TOKEN }}
           release-tag: "${{env.newRelease_tag_name}}"
-      
-#       - name: Slack Post Beta Announcement
-#         if: contains(env.release_0_name, 'beta')
-#         id: slackAnnouncementBeta
-#         uses: slackapi/slack-github-action@v1.19.0
-#         with:
-#           channel-id: 'C03EBJLG886'
-#           payload: |
-#             {
-#               "blocks": [
-#                 {
-#                   "type": "header",
-#                   "text": {
-#                     "type": "plain_text",
-#                     "text": "Bridge ${{ env.newRelease_name }} is now available!"
-#                   }
-#                 },
-#                 {
-#                 "type": "section",
-#                   "text": {
-#                     "type": "mrkdwn",
-#                     "text": "*Get it <${{ env.newRelease_html_url }}|here>*\n"
-#                   }
-#                 },
-#                 {
-#                   "type": "section",
-#                   "text": {
-#                     "type": "mrkdwn",
-#                     "text": ${{ toJson(env.newRelease_body) }}
-#                   }
-#                 }
-#               ]
-#             }
-#         env:
-#           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-      
-#       - name: Slack Change Beta Topic
-#         if: contains(env.release_0_name, 'beta')
-#         id: slackTopicBeta
-#         run: |
-#           curl \
-#           -X POST \
-#           -H "Authorization: Bearer ${{ secrets.SLACK_BOT_TOKEN }}" \
-#           --data "channel=C03EBJLG886&topic=${{ env.newRelease_name }} Bridge Firmware" \
-#           https://slack.com/api/conversations.setTopic
